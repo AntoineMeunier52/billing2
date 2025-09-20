@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URI")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String?  @unique
+  password String?
+  name String?
+  reset_token String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// defining the customer object
+model Customer {
+  id  Int @id @default(autoincrement())
+  name  String? @unique
+  address String?
+  city String?
+  province String?
+  postalCode Int?
+
+  // defining the pourcentage to add on the sip line price
+  natioMobPourcent Float?
+  natioFixPourcent Float?
+  interMobPourcent Float?
+  interFixPourcent Float?
+
+  ddiPrice Float?
+
+  // a cumstomer can have multiple subscriptions
+  subscriptions Subscription[]
+
+  // a customer can have multiple sip line
+  sipLine SipLine[]
+}
+
+model Subscription {
+  id Int @id @default(autoincrement())
+  definition String?
+  price Int?
+
+  // relation
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+}
+
+//
+// the description fields make references to the desciption fields in the Sewan configuration (see with the UC_TEAMS for more information about it)
+//
+// if a Sip group is created you need to enter the Profile_name of the group see the Sewan configuration (see with the UC_TEAMS for more information about it)
+//
+model SipLine {
+  id Int @id @default(autoincrement())
+  descriptionName String? @unique
+  
+  //relation
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+}
