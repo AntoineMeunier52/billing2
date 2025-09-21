@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     ddiPrice,
     subscriptions,
     sipLine,
+    ddiName,
   } = await readBody<Customers>(event);
 
   try {
@@ -55,6 +56,14 @@ export default defineEventHandler(async (event) => {
           sipLine && sipLine.length
             ? {
                 create: sipLine.map((s) => ({
+                  descriptionName: s.descriptionName,
+                })),
+              }
+            : undefined,
+        ddiName:
+          ddiName && ddiName.length
+            ? {
+                create: ddiName.map((s) => ({
                   descriptionName: s.descriptionName,
                 })),
               }

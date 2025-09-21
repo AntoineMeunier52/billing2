@@ -2,6 +2,7 @@
   <UContainer>
     <p class="text-2xl">Customers</p>
     <USeparator />
+    <CustomerAddButton />
   </UContainer>
 </template>
 

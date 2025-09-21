@@ -11,4 +11,5 @@ export interface Customers {
   ddiPrice: number;
   subscriptions: { definition: string; price: number }[];
   sipLine: { descriptionName: string }[];
+  ddiName: { descriptionName: string }[];
 }

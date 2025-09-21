@@ -42,6 +42,9 @@ model Customer {
 
   // a customer can have multiple sip line
   sipLine SipLine[]
+
+  // a customer can have multple ddi name
+  ddiName DdiName[]
 }
 
 model Subscription {
@@ -64,6 +67,15 @@ model SipLine {
   descriptionName String? @unique
   
   //relation
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId Int
+}
+
+model DdiName {
+  id Int @id @default(autoincrement())
+  descriptionName String? @unique
+
+  // relation
   customer Customer @relation(fields: [customerId], references: [id])
   customerId Int
 }

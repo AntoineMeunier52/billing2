@@ -1,6 +1,6 @@
 <template>
   <div>
-    <nav class="flex justify-between items-center h-[70px] shadow-md">
+    <nav class="flex justify-between items-center h-[70px] shadow-md mb-[20px]">
       <h1 class="ml-[30px] text-2xl font-bold">BILLING</h1>
       <ul
         class="flex mr-[30px] [&>li]:mx-[10px] [&>li]:hover:text-blue-500 [&>li]:hover:underline"
