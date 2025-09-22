@@ -4,10 +4,15 @@
     <div
       v-for="(item, idx) in customers?.customers"
       :key="item.id ?? idx"
-      class="group my-1 h-6 px-3 rounded-full flex items-center hover:bg-gray-100"
+      class="group grid grid-cols-6 gap-2 my-1 h-6 px-3 rounded-full items-center hover:bg-gray-100"
       @dblclick="handleDblClick()"
     >
       <p class="truncate">{{ item.name }}</p>
+      <p>Natio. Mob. {{ item.natioMobPourcent }} %</p>
+      <p>Natio. Fix. {{ item.natioFixPourcent }} %</p>
+      <p>Inter. Mob. {{ item.interMobPourcent }} %</p>
+      <p>Inter. Fix. {{ item.interFixPourcent }} %</p>
+      <p class="group-hover:hidden">Ddi Price {{ item.ddiPrice }} €</p>
 
       <!-- only visible when hover the parent div (work with tailwind group) -->
       <p
