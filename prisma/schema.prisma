@@ -23,19 +23,19 @@ model User {
 // defining the customer object
 model Customer {
   id  Int @id @default(autoincrement())
-  name  String? @unique
-  address String?
-  city String?
-  province String?
-  postalCode Int?
+  name  String @unique
+  address String
+  city String
+  province String
+  postalCode Int
 
   // defining the pourcentage to add on the sip line price
-  natioMobPourcent Float?
-  natioFixPourcent Float?
-  interMobPourcent Float?
-  interFixPourcent Float?
+  natioMobPourcent Float
+  natioFixPourcent Float
+  interMobPourcent Float
+  interFixPourcent Float
 
-  ddiPrice Float?
+  ddiPrice Float
 
   // a cumstomer can have multiple subscriptions
   subscriptions Subscription[]
@@ -49,8 +49,8 @@ model Customer {
 
 model Subscription {
   id Int @id @default(autoincrement())
-  definition String?
-  price Int?
+  definition String
+  price Int
 
   // relation
   customer Customer @relation(fields: [customerId], references: [id])
@@ -64,7 +64,7 @@ model Subscription {
 //
 model SipLine {
   id Int @id @default(autoincrement())
-  descriptionName String? @unique
+  descriptionName String @unique
   
   //relation
   customer Customer @relation(fields: [customerId], references: [id])
@@ -73,7 +73,7 @@ model SipLine {
 
 model DdiName {
   id Int @id @default(autoincrement())
-  descriptionName String? @unique
+  descriptionName String @unique
 
   // relation
   customer Customer @relation(fields: [customerId], references: [id])

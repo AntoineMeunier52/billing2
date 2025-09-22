@@ -335,6 +335,7 @@
         color="neutral"
         class="rounded-xl"
         @click="handleSubmit"
+        :loading="loading"
       />
     </template>
   </UModal>
