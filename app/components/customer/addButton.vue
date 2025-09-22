@@ -10,7 +10,7 @@
       body: 'p-0',
     }"
   >
-    <div class="p-4">
+    <div class="py-4">
       <UButton
         class="h-[16px] w-full flex rounded-xl"
         color="neutral"

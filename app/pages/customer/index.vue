@@ -1,7 +1,9 @@
 <template>
   <UContainer>
     <p class="text-2xl">Customers</p>
-    <USeparator />
+    <USeparator class="pb-[12px]" />
+    <CustomerView />
+    <USeparator class="pt-[12px]" />
     <CustomerAddButton />
   </UContainer>
 </template>
