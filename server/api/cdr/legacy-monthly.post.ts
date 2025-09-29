@@ -5,7 +5,7 @@ import tz from "dayjs/plugin/timezone";
 import {
   writeLegacyInvoicePDF,
   type LegacyBillingBlock,
-} from "@@/server/utils/pdf-invoice-legacy";
+} from "~~/server/api/utils/pdf-invoice-legacy";
 import type { Decimal } from "@prisma/client/runtime/library";
 
 dayjs.extend(utc);
@@ -74,17 +74,16 @@ export default defineEventHandler(async (event) => {
       )
     : undefined;
 
-  // mois courant
-  const monthStart = dayjs().tz().startOf("month");
-  const monthEnd = monthStart.add(1, "month").subtract(1, "day"); // dernier jour inclus
+  // current month
+  const monthStart = dayjs().tz().subtract(1, "month").startOf("month");
+  const displayEnd = monthStart.endOf("month");
   const monthKey = monthStart.toDate();
 
-  // formats de date pour PDF/chemin
   const yearMonth = monthStart.format("YYYY-MM");
   const fromDash = monthStart.format("DD-MM-YYYY");
-  const toDash = monthEnd.format("DD-MM-YYYY");
+  const toDash = displayEnd.format("DD-MM-YYYY");
   const fromSlash = monthStart.format("DD/MM/YYYY");
-  const toSlash = monthEnd.format("DD/MM/YYYY");
+  const toSlash = displayEnd.format("DD/MM/YYYY");
 
   // clients + subs + DDI names
   const customersList = await prisma.customer.findMany({

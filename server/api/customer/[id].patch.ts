@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   try {
     return { success: true, message: "Customer change successfully" };
   } catch (err: any) {

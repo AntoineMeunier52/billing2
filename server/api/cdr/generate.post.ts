@@ -282,14 +282,14 @@ export default defineEventHandler(async (event) => {
     : undefined;
 
   // mois courant
-  const monthStart = dayjs().tz().startOf("month");
+  const monthStart = dayjs().tz().subtract(1, "month").startOf("month");
   const monthEnd = monthStart.add(1, "month");
-  //const startDate = monthStart.format("YYYY-MM-01");
-  //const stopDate = monthEnd.format("YYYY-MM-01");
-  const monthKey = monthStart.startOf("month").toDate();
+  const startDate = monthStart.format("YYYY-MM-01");
+  const stopDate = monthEnd.format("YYYY-MM-01");
+  const monthKey = monthStart.toDate();
 
-  const startDate = "2025-08-01";
-  const stopDate = "2025-09-1";
+  // const startDate = "2025-08-01";
+  // const stopDate = "2025-09-1";
 
   // map SIP
   const sipMap = await loadSipMap(allowedIds);

@@ -37,10 +37,6 @@ export type LegacyInvoiceInput = {
   outDirBase: string;
 };
 
-function euro(n: number) {
-  return `${n.toFixed(2)}€`;
-}
-
 export async function writeLegacyInvoicePDF(data: LegacyInvoiceInput) {
   const base = data.outDirBase.replace(/\/$/, "");
   const outDir = path.join(base, data.month.yearMonth);
@@ -98,7 +94,7 @@ export async function writeLegacyInvoicePDF(data: LegacyInvoiceInput) {
 
   // Adresses
   WriteAddress("Axians SA\nKruiskouter 1\n1730 Asse\nBELGIUM", "black", 80, 30);
-  WriteAddress(data.customer.address, "black", 68, 430);
+  WriteAddress(data.customer.address, "black", 80, 430);
 
   //subscriptions
   let y = 140;
