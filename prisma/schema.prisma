@@ -45,6 +45,9 @@ model Customer {
 
   // a customer can have multple ddi name
   ddiName DdiName[]
+
+  // a customer can have mutliple month generation
+  monthGeneration MonthlyCdrSummary[]
 }
 
 model Subscription {
@@ -78,4 +81,37 @@ model DdiName {
   // relation
   customer Customer @relation(fields: [customerId], references: [id])
   customerId Int
+}
+
+model MonthlyCdrSummary {
+  id               Int      @id @default(autoincrement())
+  customerId       Int
+  month            DateTime   // 1er jour du mois 00:00:00
+  callCount        Int
+  totalDurationSec Int
+  totalBaseCost    Decimal @db.Decimal(18,6)
+  totalBilledCost  Decimal @db.Decimal(18,6)
+
+  // breakdown par type d’appel (base = opérateur, bill = facturé client)
+  base_natio_mob   Decimal @db.Decimal(18,6)
+  base_natio_fix   Decimal @db.Decimal(18,6)
+  base_inter_mob   Decimal @db.Decimal(18,6)
+  base_inter_fix   Decimal @db.Decimal(18,6)
+  bill_natio_mob   Decimal @db.Decimal(18,6)
+  bill_natio_fix   Decimal @db.Decimal(18,6)
+  bill_inter_mob   Decimal @db.Decimal(18,6)
+  bill_inter_fix   Decimal @db.Decimal(18,6)
+  count_natio_mob Int
+  count_natio_fix Int
+  count_inter_mob Int
+  count_inter_fix Int
+  time_natio_mob Int
+  time_natio_fix Int
+  time_inter_mob Int
+  time_inter_fix Int
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, month], name: "customerId_month")
+  @@index([month])
 }

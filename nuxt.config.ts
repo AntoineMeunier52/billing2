@@ -31,4 +31,11 @@ export default defineNuxtConfig({
       maxAge: 60 * 24 * 7, //7 days
     },
   },
+
+  nitro: {
+    scheduledTasks: {
+      "0 3 1 * *": ["cdr:read"],
+      "0 4 1 * *": ["cdr:pdf"],
+    },
+  },
 });

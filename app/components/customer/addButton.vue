@@ -25,7 +25,7 @@
     <template #body>
       <!-- Scroll container -->
       <div class="max-h-[70vh] overflow-y-auto px-4 pb-4 custom-scroll">
-        <UForm :state="customer" class="space-y-8">
+        <UForm :state="customer" ref="form" class="space-y-8">
           <!-- ========== Infos de base ========== -->
           <section
             class="rounded-2xl border border-neutral-200/70 dark:border-neutral-800/70 bg-white/70 dark:bg-neutral-900/50 shadow-sm backdrop-blur-sm"
@@ -178,7 +178,7 @@
                 <div>
                   <UFormField
                     :label="!count ? 'Description' : undefined"
-                    name="desciption"
+                    name="definition"
                     class="mb-2"
                   >
                     <UInput v-model="item.definition" />
@@ -236,7 +236,7 @@
             <div class="p-4 space-y-3">
               <UForm
                 v-for="(item, count) in customer.sipLine"
-                key="count"
+                :key="count"
                 :state="item"
                 attach
                 class="flex items-center justify-between bg-neutral-50/60 dark:bg-neutral-800/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl p-3"
@@ -291,7 +291,7 @@
             <div class="p-4 space-y-3">
               <UForm
                 v-for="(item, count) in customer.ddiName"
-                key="count"
+                :key="count"
                 :state="item"
                 attach
                 class="flex items-center justify-between bg-neutral-50/60 dark:bg-neutral-800/40 border border-neutral-200/70 dark:border-neutral-800/70 rounded-xl p-3"
@@ -342,12 +342,14 @@
 </template>
 
 <script lang="ts" setup>
-import { custom } from "zod";
+import { z } from "zod";
 
 const toast = useToast();
 
 const open = ref(false);
 const loading = ref(false);
+
+const form = ref<any>(null);
 
 const customer: Customers = reactive({
   name: "",
@@ -401,6 +403,7 @@ function removeDdiName(count: number) {
 async function handleSubmit() {
   try {
     loading.value = true;
+
     await $fetch("/api/customer/create", {
       method: "POST",
       body: customer,
@@ -428,7 +431,7 @@ async function handleSubmit() {
       title: "Error",
       description: msg,
       color: "error",
-      icon: "lucides:alert-triangle",
+      icon: "lucide:alert-triangle",
     });
     console.error(err);
   } finally {
@@ -446,7 +449,6 @@ async function handleSubmit() {
 }
 .custom-scroll::-webkit-scrollbar-thumb {
   background: rgba(125, 125, 125, 0.3);
-  border-radius: 9999px;
 }
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(125, 125, 125, 0.45);
