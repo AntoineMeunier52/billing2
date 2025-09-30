@@ -1,40 +1,57 @@
 <template>
-  <div class="login">
-    <AuthForm :loading="loading" @submit="login" title="Sign in" />
-    <p class="login__text">
-      New here?
-      <nuxt-link :to="{ name: 'signup' }">Sign up</nuxt-link>
-    </p>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div class="w-full max-w-md space-y-4">
+      <AuthForm :loading="loading" @submit="handleLogin" title="Sign in" />
+
+      <UCard class="text-center">
+        <NuxtLink to="/auth/forgot-password" class="text-sm text-primary hover:underline">
+          Forgot password?
+        </NuxtLink>
+      </UCard>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useAuthStore } from '~/store/auth';
+
+definePageMeta({
+  middleware: 'guest',
+  layout: false,
+});
+
 const loading = ref(false);
 const router = useRouter();
+const authStore = useAuthStore();
+const toast = useToast();
 
-const login = async (body) => {
+const handleLogin = async (body: { email: string; password: string }) => {
   loading.value = true;
   try {
-    await $fetch("/api/auth/login", {
-      method: "POST",
-      body,
-    });
-    router.push({ name: "Dashboard" });
-    loading.value = false;
-  } catch (error) {
-    console.log({ error });
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "statusMessage" in error
-    ) {
-      alert((error as { statusMessage?: string }).statusMessage);
+    const success = await authStore.login(body.email, body.password);
+
+    if (success) {
+      toast.add({
+        title: 'Success',
+        description: 'Logged in successfully',
+        color: 'success',
+      });
+      await router.push('/');
     } else {
-      alert(String(error));
+      toast.add({
+        title: 'Error',
+        description: 'Invalid credentials',
+        color: 'error',
+      });
     }
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error?.data?.statusMessage || 'Login failed',
+      color: 'error',
+    });
+  } finally {
     loading.value = false;
   }
 };
 </script>
-
-<style></style>

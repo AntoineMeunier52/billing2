@@ -1,16 +1,8 @@
 // DATA INTERFACE
 interface User {
-  id: string;
+  id: number;
   email: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
+  name: string;
 }
 
 //API RESPONSE TYPE
@@ -90,7 +82,7 @@ export const useAuthStore = defineStore("auth", () => {
       });
     } finally {
       clearAuth();
-      await navigateTo("/login");
+      await navigateTo("/auth/login");
     }
   }
 

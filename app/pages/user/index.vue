@@ -1,10 +1,14 @@
 <template>
   <UContainer>
-    <p class="text-2xl">Customers</p>
+    <p class="text-2xl">Users</p>
     <USeparator class="pb-[12px]" />
-    <CustomerView />
+    <ClientOnly>
+      <UserView />
+    </ClientOnly>
     <USeparator class="pt-[12px]" />
-    <CustomerAddButton />
+    <ClientOnly>
+      <UserAddButton />
+    </ClientOnly>
   </UContainer>
 </template>
 
@@ -13,5 +17,3 @@ definePageMeta({
   middleware: 'protected',
 });
 </script>
-
-<style></style>

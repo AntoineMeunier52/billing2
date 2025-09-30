@@ -2,6 +2,10 @@
   <div>test</div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({
+  middleware: 'protected',
+});
+</script>
 
 <style></style>

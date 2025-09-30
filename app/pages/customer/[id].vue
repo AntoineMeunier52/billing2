@@ -5,6 +5,10 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  middleware: 'protected',
+});
+
 const route = useRoute();
 
 if (route.params.id) {

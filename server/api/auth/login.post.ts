@@ -1,62 +1,48 @@
-import * as jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import prisma from "@@/lib/prisma";
-import z from "zod";
+import prisma from "~~/lib/prisma";
+import { z } from "zod";
+import { verifyPassword, generateToken } from "~~/server/utils/auth";
 
-//schema validation
-const UserValidator = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, "Password too short, minimum length 8"),
+const LoginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export default defineEventHandler(async (event) => {
-  const { email, password } = await readBody(event);
+  const body = await readBody(event);
+
+  const validation = LoginSchema.safeParse(body);
+  if (!validation.success) {
+    const messages = validation.error.issues
+      .map((i) => `${i.path.join(".")}: ${i.message}`)
+      .join(" | ");
+
+    throw createError({
+      statusCode: 400,
+      statusMessage: messages,
+    });
+  }
+
+  const { email, password } = validation.data;
 
   const user = await prisma.user.findUnique({
     where: { email },
   });
 
-  const validatorResponse = await UserValidator.safeParseAsync({
-    email,
-    password,
-  });
-
-  console.log(validatorResponse.error);
-  if (!validatorResponse.success) {
-    const messages = validatorResponse.error.issues
-      .map((i) => `${i.path.join(".") || "form"}: ${i.message}`)
-      .join(" | ");
-
-    throw createError({
-      statusCode: 400,
-      message: messages,
-    });
-  }
-
-  if (
-    !user ||
-    !user.password ||
-    !(await bcrypt.compare(password, user.password))
-  ) {
+  if (!user || !user.password || !(await verifyPassword(password, user.password))) {
     throw createError({
       statusCode: 401,
-      message: "Invalid credentials",
+      statusMessage: "Invalid credentials",
     });
   }
 
-  const token = jwt.sign(
-    { userId: user.id },
-    process.env.JWT_SECRET as string,
-    { expiresIn: "24h" }
-  );
+  const token = generateToken({ userId: user.id, email: user.email });
 
   return {
     token,
     user: {
       id: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name: user.name,
     },
   };
 });
