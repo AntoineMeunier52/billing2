@@ -25,14 +25,18 @@ export const useAuthStore = defineStore("auth", () => {
   function setToken(t: string) {
     token.value = t;
     //change the store later to avoid XSS vulnerability
-    localStorage.setItem("token", t);
+    if (process.client) {
+      localStorage.setItem("token", t);
+    }
   }
 
   function clearAuth() {
     user.value = null;
     token.value = null;
 
-    localStorage.removeItem("token");
+    if (process.client) {
+      localStorage.removeItem("token");
+    }
   }
 
   async function login(email: string, password: string) {
@@ -74,12 +78,14 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function logout() {
     try {
-      const t = localStorage.getItem("token");
-      if (!t) return;
-      await $fetch("/api/auth/logout", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${t}` },
-      });
+      if (process.client) {
+        const t = localStorage.getItem("token");
+        if (!t) return;
+        await $fetch("/api/auth/logout", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${t}` },
+        });
+      }
     } finally {
       clearAuth();
       await navigateTo("/auth/login");
@@ -88,6 +94,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function checkAuth() {
     try {
+      if (!process.client) return false;
       const t = localStorage.getItem("token");
       if (!t) return false;
 

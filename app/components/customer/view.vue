@@ -363,20 +363,35 @@
 </template>
 
 <script lang="ts" setup>
-const token = ref<string | null>(null);
 const loading = ref(false);
 const isEditOpen = ref(false);
 const toast = useToast();
+const customers = ref<any>(null);
+const status = ref<"idle" | "pending" | "success" | "error">("idle");
+
+async function fetchCustomers() {
+  status.value = "pending";
+  try {
+    const token = process.client ? localStorage.getItem("token") : null;
+    const response = await $fetch("/api/customer/getAll", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    customers.value = response;
+    status.value = "success";
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    status.value = "error";
+  }
+}
+
+async function refresh() {
+  await fetchCustomers();
+}
 
 onMounted(() => {
-  token.value = localStorage.getItem("token");
-});
-
-const { status, data: customers, refresh } = await useFetch("/api/customer/getAll", {
-  lazy: true,
-  headers: computed(() => ({
-    Authorization: token.value ? `Bearer ${token.value}` : "",
-  })),
+  fetchCustomers();
 });
 
 const editForm = ref({
@@ -459,7 +474,7 @@ function removeDdiName(count: number) {
 async function handleUpdate() {
   loading.value = true;
   try {
-    const token = localStorage.getItem("token");
+    const token = process.client ? localStorage.getItem("token") : null;
     await $fetch(`/api/customer/${editForm.value.id}`, {
       method: "PATCH",
       body: {
@@ -507,7 +522,7 @@ async function handleDelete() {
 
   loading.value = true;
   try {
-    const token = localStorage.getItem("token");
+    const token = process.client ? localStorage.getItem("token") : null;
     await $fetch(`/api/customer/${editForm.value.id}`, {
       method: "DELETE",
       headers: {

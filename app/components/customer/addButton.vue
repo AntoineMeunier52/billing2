@@ -404,7 +404,7 @@ async function handleSubmit() {
   try {
     loading.value = true;
 
-    const token = localStorage.getItem("token");
+    const token = process.client ? localStorage.getItem("token") : null;
     await $fetch("/api/customer/create", {
       method: "POST",
       body: customer,

@@ -82,10 +82,11 @@
 </template>
 
 <script lang="ts" setup>
-const token = ref<string | null>(null);
 const isEditOpen = ref(false);
 const loading = ref(false);
 const toast = useToast();
+const users = ref<any>(null);
+const status = ref<"idle" | "pending" | "success" | "error">("idle");
 
 const editForm = ref({
   id: 0,
@@ -93,19 +94,29 @@ const editForm = ref({
   email: "",
 });
 
-onMounted(() => {
-  token.value = localStorage.getItem("token");
-});
+async function fetchUsers() {
+  status.value = "pending";
+  try {
+    const token = process.client ? localStorage.getItem("token") : null;
+    const response = await $fetch("/api/users", {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+    users.value = response;
+    status.value = "success";
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    status.value = "error";
+  }
+}
 
-const {
-  status,
-  data: users,
-  refresh,
-} = await useFetch("/api/users", {
-  lazy: true,
-  headers: computed(() => ({
-    Authorization: token.value ? `Bearer ${token.value}` : "",
-  })),
+async function refresh() {
+  await fetchUsers();
+}
+
+onMounted(() => {
+  fetchUsers();
 });
 
 function handleDblClick(user: any) {
@@ -120,6 +131,7 @@ function handleDblClick(user: any) {
 async function handleUpdate() {
   loading.value = true;
   try {
+    const token = process.client ? localStorage.getItem("token") : null;
     await $fetch(`/api/users/${editForm.value.id}`, {
       method: "PATCH",
       body: {
@@ -127,7 +139,7 @@ async function handleUpdate() {
         email: editForm.value.email,
       },
       headers: {
-        Authorization: `Bearer ${token.value}`,
+        Authorization: token ? `Bearer ${token}` : "",
       },
     });
 
@@ -156,10 +168,11 @@ async function handleDelete() {
 
   loading.value = true;
   try {
+    const token = process.client ? localStorage.getItem("token") : null;
     await $fetch(`/api/users/${editForm.value.id}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token.value}`,
+        Authorization: token ? `Bearer ${token}` : "",
       },
     });
 

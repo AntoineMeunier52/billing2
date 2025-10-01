@@ -9,12 +9,12 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        ".prisma/client/index-browser":
-          "./node_modules/.prisma/client/index.js",
+        ".prisma/client/index-browser": "unenv/runtime/mock/empty",
+        "@prisma/client/index-browser": "unenv/runtime/mock/empty",
       },
     },
     optimizeDeps: {
-      exclude: ["@prisma/client", "prisma"],
+      exclude: ["@prisma/client", "prisma", ".prisma/client"],
     },
     ssr: {
       external: ["@prisma/client", ".prisma/client"],
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
     "@nuxt/ui",
-    "@prisma/nuxt",
+    // "@prisma/nuxt", // Removed - causes client-side import issues
     "nuxt-authorization",
     "nuxt-auth-utils",
     "@pinia/nuxt",
@@ -55,7 +55,10 @@ export default defineNuxtConfig({
       "0 4 1 * *": ["pdf:create"],
     },
     externals: {
-      inline: ["@prisma/client"],
+      inline: [".prisma"],
+    },
+    rollupConfig: {
+      external: [".prisma/client", "@prisma/client"],
     },
   },
 

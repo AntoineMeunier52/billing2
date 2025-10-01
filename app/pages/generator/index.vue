@@ -115,7 +115,7 @@ async function handleGenerate() {
   error.value = null;
 
   try {
-    const token = localStorage.getItem("token");
+    const token = process.client ? localStorage.getItem("token") : null;
     const response = await $fetch('/api/cdr/generate-with-pdf', {
       method: 'POST',
       timeout: 600000, // 10 minutes timeout
