@@ -7,6 +7,19 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        ".prisma/client/index-browser":
+          "./node_modules/.prisma/client/index.js",
+      },
+    },
+    optimizeDeps: {
+      exclude: ["@prisma/client", "prisma"],
+    },
+    ssr: {
+      external: ["@prisma/client", ".prisma/client"],
+      noExternal: [],
+    },
   },
   modules: [
     "@nuxt/content",
@@ -41,5 +54,13 @@ export default defineNuxtConfig({
       "0 3 1 * *": ["cdr:read"],
       "0 4 1 * *": ["pdf:create"],
     },
+    externals: {
+      inline: ["@prisma/client"],
+    },
+  },
+
+  // Exclude Prisma from client bundle
+  build: {
+    transpile: ["@prisma/client"],
   },
 });

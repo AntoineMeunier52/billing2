@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "start": "node .output/server/index.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

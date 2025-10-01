@@ -54,3 +54,25 @@ export function requireAuth(event: H3Event): JWTPayload {
   }
   return user;
 }
+
+/**
+ * Allow internal API calls from scheduled tasks
+ * Checks for either valid JWT token OR internal API token
+ */
+export function requireAuthOrInternal(event: H3Event): JWTPayload | null {
+  // First check for internal API token
+  const internalToken = getHeader(event, "x-internal-token");
+  const expectedInternalToken = process.env.INTERNAL_API_TOKEN;
+
+  if (
+    internalToken &&
+    expectedInternalToken &&
+    internalToken === expectedInternalToken
+  ) {
+    // Internal call authenticated, return null (no user)
+    return null;
+  }
+
+  // Otherwise require normal JWT auth
+  return requireAuth(event);
+}
