@@ -1,0 +1,257 @@
+================================================================================
+                   PRODUCTION DEPLOYMENT CHECKLIST
+                        Billing Application
+================================================================================
+
+1. ENVIRONMENT VARIABLES
+   -------------------------
+   [ ] Create .env.production file with:
+       - DATABASE_URL (production MySQL connection string)
+       - JWT_SECRET (generate new secure random string, min 32 chars)
+       - APP_URL (production domain, e.g., https://billing.yourdomain.com)
+       - SMTP_HOST (production SMTP server)
+       - SMTP_PORT (587 for TLS or 465 for SSL)
+       - SMTP_USER (production email account)
+       - SMTP_PASS (production email password)
+       - SMTP_FROM (sender email address)
+       - NODE_ENV=production
+
+   [ ] Verify all sensitive values are different from development
+   [ ] Never commit .env.production to version control
+
+
+2. DATABASE SETUP
+   -------------------------
+   [ ] Create production MySQL database
+   [ ] Configure database user with appropriate permissions
+   [ ] Run Prisma migrations: npx prisma migrate deploy
+   [ ] Verify database schema is up to date
+   [ ] Create initial admin user manually or via script
+   [ ] Set up database backups (daily recommended)
+   [ ] Configure database connection pooling if needed
+
+
+3. SECURITY CONFIGURATION
+   -------------------------
+   [ ] Change JWT_SECRET to strong random value (different from dev)
+   [ ] Verify all API endpoints require authentication except:
+       - /api/auth/login
+       - /api/auth/forgot-password
+       - /api/auth/reset-password
+   [ ] Enable HTTPS only (no HTTP access)
+   [ ] Configure CORS if needed (restrict allowed origins)
+   [ ] Set secure cookie flags if using cookies
+   [ ] Review and restrict file upload limits
+   [ ] Enable rate limiting for authentication endpoints
+   [ ] Set up CSP (Content Security Policy) headers
+   [ ] Disable server debug/error details in responses
+
+
+4. EMAIL CONFIGURATION
+   -------------------------
+   [ ] Test SMTP connection with production credentials
+   [ ] Verify activation emails are sent correctly
+   [ ] Verify password reset emails are sent correctly
+   [ ] Check email templates display correctly
+   [ ] Ensure APP_URL in emails points to production domain
+   [ ] Test 24h token expiry functionality
+   [ ] Configure SPF/DKIM records for email domain
+
+
+5. FILE SYSTEM & STORAGE
+   -------------------------
+   [ ] Verify CDR file path is accessible and writable
+   [ ] Create invoices output directory
+   [ ] Set proper file permissions (read/write for app only)
+   [ ] Configure disk space monitoring
+   [ ] Set up backup for generated PDF invoices
+   [ ] Verify CDR processing scripts are in place:
+       - server/cdr/* scripts
+       - server/utils/cdr-* utilities
+
+
+6. BUILD & DEPLOYMENT
+   -------------------------
+   [ ] Run: npm run build
+   [ ] Test production build locally first
+   [ ] Verify all dependencies are installed (npm ci)
+   [ ] Remove development dependencies from production
+   [ ] Configure process manager (PM2, systemd, Docker)
+   [ ] Set up auto-restart on crash
+   [ ] Configure log rotation
+   [ ] Set appropriate memory limits for Node.js
+
+
+7. CDR & PDF GENERATION
+   -------------------------
+   [ ] Verify CDR API credentials for Sewan
+   [ ] Test CDR reading process in production
+   [ ] Test PDF generation with real data
+   [ ] Verify output directory permissions
+   [ ] Set up scheduled job for monthly processing (if needed)
+   [ ] Monitor CDR processing performance (can take several minutes)
+   [ ] Verify PDF fonts and formatting are correct
+
+
+8. APPLICATION STARTUP
+   -------------------------
+   [ ] Start application: npm run start (or production command)
+   [ ] Verify app listens on correct port
+   [ ] Check application logs for errors
+   [ ] Test health check endpoint if available
+   [ ] Verify process runs under non-root user
+   [ ] Configure firewall rules (allow HTTP/HTTPS)
+
+
+9. TESTING CHECKLIST
+   -------------------------
+   [ ] Test user login with production credentials
+   [ ] Test logout functionality
+   [ ] Test password reset flow end-to-end
+   [ ] Test new user activation flow
+   [ ] Test customer CRUD operations
+   [ ] Test user CRUD operations (admin)
+   [ ] Test CDR + PDF generation on /generator page
+   [ ] Verify authentication middleware on all protected routes
+   [ ] Test unauthorized access returns 401
+   [ ] Test with different browsers/devices
+   [ ] Verify all navigation and redirects work correctly
+
+
+10. MONITORING & LOGGING
+    -------------------------
+    [ ] Set up application logging (winston, pino, etc.)
+    [ ] Configure log aggregation (if using multiple instances)
+    [ ] Monitor database connection pool
+    [ ] Set up error tracking (Sentry, Rollbar, etc.)
+    [ ] Monitor disk space usage (PDFs accumulate)
+    [ ] Set up uptime monitoring
+    [ ] Configure alerts for:
+        - Application crashes
+        - Database connection failures
+        - SMTP errors
+        - High memory usage
+        - Disk space warnings
+
+
+11. PERFORMANCE OPTIMIZATION
+    -------------------------
+    [ ] Enable Nuxt production optimizations
+    [ ] Configure CDN for static assets (if needed)
+    [ ] Set up caching headers
+    [ ] Optimize database queries (indexes)
+    [ ] Consider Redis for session storage (if scaling)
+    [ ] Monitor response times
+    [ ] Set up database query logging for slow queries
+
+
+12. BACKUP & DISASTER RECOVERY
+    -------------------------
+    [ ] Set up automated database backups
+    [ ] Test database restore procedure
+    [ ] Backup .env.production file securely (encrypted)
+    [ ] Document recovery procedures
+    [ ] Store backups in separate location
+    [ ] Test backup restoration regularly
+
+
+13. DOCUMENTATION
+    -------------------------
+    [ ] Document deployment procedure
+    [ ] Document environment variables
+    [ ] Create runbook for common operations
+    [ ] Document CDR processing schedule
+    [ ] Create admin user guide
+    [ ] Document troubleshooting steps
+
+
+14. FINAL VERIFICATION
+    -------------------------
+    [ ] All tests passing
+    [ ] No console errors in browser
+    [ ] No server errors in logs
+    [ ] SSL certificate valid and trusted
+    [ ] Email deliverability confirmed
+    [ ] Authentication flow tested end-to-end
+    [ ] All protected routes require login
+    [ ] PDF generation working correctly
+    [ ] Database backups configured
+    [ ] Monitoring alerts configured
+    [ ] Contact information updated
+    [ ] Emergency rollback plan documented
+
+
+15. POST-DEPLOYMENT
+    -------------------------
+    [ ] Monitor application for first 24-48 hours
+    [ ] Check error logs regularly
+    [ ] Verify email delivery rates
+    [ ] Monitor database performance
+    [ ] Track CDR processing times
+    [ ] Gather user feedback
+    [ ] Plan regular maintenance windows
+
+
+================================================================================
+CRITICAL SECURITY NOTES:
+================================================================================
+
+1. JWT_SECRET must be minimum 32 characters, randomly generated
+2. Never expose DATABASE_URL or JWT_SECRET in client code
+3. All customer/user/CDR endpoints now require authentication ✓
+4. Passwords are hashed with bcrypt (10 rounds) ✓
+5. Reset tokens expire after 24 hours ✓
+6. Production SMTP credentials must be different from dev
+7. Regular security updates for dependencies (npm audit)
+
+
+================================================================================
+DEPLOYMENT COMMANDS REFERENCE:
+================================================================================
+
+# Install dependencies
+npm ci --production
+
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate deploy
+
+# Build application
+npm run build
+
+# Start production server
+npm run start
+
+# Using PM2 (recommended)
+pm2 start npm --name "billing" -- start
+pm2 save
+pm2 startup
+
+
+================================================================================
+ENVIRONMENT VARIABLES TEMPLATE:
+================================================================================
+
+# Database
+DATABASE_URL="mysql://user:password@host:3306/database"
+
+# JWT
+JWT_SECRET="YOUR_SECURE_RANDOM_STRING_MIN_32_CHARS"
+
+# Application
+APP_URL="https://billing.yourdomain.com"
+NODE_ENV="production"
+
+# SMTP
+SMTP_HOST="smtp.yourdomain.com"
+SMTP_PORT="587"
+SMTP_USER="noreply@yourdomain.com"
+SMTP_PASS="your_smtp_password"
+SMTP_FROM="Billing Platform <noreply@yourdomain.com>"
+
+
+================================================================================
+END OF CHECKLIST
+================================================================================

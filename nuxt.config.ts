@@ -32,10 +32,14 @@ export default defineNuxtConfig({
     },
   },
 
-  // nitro: {
-  //   scheduledTasks: {
-  //     "0 3 1 * *": ["cdr:read"],
-  //     "0 4 1 * *": ["cdr:pdf"],
-  //   },
-  // },
+  nitro: {
+    experimental: {
+      tasks: true,
+    },
+    esbuild: { options: { target: "es2020" } },
+    scheduledTasks: {
+      "0 3 1 * *": ["cdr:read"],
+      "0 4 1 * *": ["pdf:create"],
+    },
+  },
 });

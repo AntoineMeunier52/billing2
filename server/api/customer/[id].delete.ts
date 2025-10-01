@@ -1,7 +1,10 @@
 import prisma from "~~/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { requireAuth } from "~~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
+  requireAuth(event);
+
   const idParam = event.context.params?.id;
   const id = Number(idParam);
 

@@ -4,7 +4,7 @@ const SMTP_HOST = process.env.SMTP_HOST || "localhost";
 const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587");
 const SMTP_USER = process.env.SMTP_USER || "";
 const SMTP_PASS = process.env.SMTP_PASS || "";
-const SMTP_FROM = process.env.SMTP_FROM || "noreply@billing.local";
+const SMTP_FROM = process.env.SMTP_FROM || "noreply@tranzcom-tool.com";
 
 interface SendEmailOptions {
   to: string;
@@ -13,7 +13,7 @@ interface SendEmailOptions {
   text?: string;
 }
 
-export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
+export async function sendEmail({ to, subject, html }: SendEmailOptions) {
   try {
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
@@ -29,12 +29,13 @@ export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
     });
 
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM,
+      from: SMTP_FROM,
       to,
       subject,
       html,
-      text: text || html.replace(/<[^>]*>/g, ""),
+      //text: text || html.replace(/<[^>]*>/g, ""),
     });
+    console.log(html);
     console.log(info);
     console.log("Email sent:", info.messageId);
     return { success: true, messageId: info.messageId };
@@ -49,12 +50,13 @@ export function generateActivationEmail(
   email: string,
   activationToken: string
 ) {
+  console.log("activation email");
   const activationUrl = `${
     process.env.APP_URL || "http://localhost:3000"
-  }/auth/activate?token=${activationToken}`;
+  }/auth/reset-password?token=${activationToken}`;
 
   return {
-    subject: "Activate Your Account - Billing Platform",
+    subject: "Set Your Password - Billing Platform",
     html: `
       <!DOCTYPE html>
       <html>
@@ -65,6 +67,7 @@ export function generateActivationEmail(
             .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
             .content { background-color: #f9f9f9; padding: 30px; }
             .credentials { background-color: #fff; border: 1px solid #ddd; padding: 15px; margin: 20px 0; }
+            .alert { background-color: #FEF3C7; border: 1px solid #F59E0B; padding: 15px; margin: 20px 0; border-radius: 5px; }
             .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
             .button { display: inline-block; background-color: #4F46E5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
           </style>
@@ -80,13 +83,19 @@ export function generateActivationEmail(
 
               <p>Click the button below to set your password and activate your account:</p>
 
-              <a href="${activationUrl}" class="button">Activate Account</a>
+              <a href="${activationUrl}" class="button">Set Password</a>
 
               <div class="credentials">
                 <p><strong>Your Email:</strong> ${email}</p>
               </div>
 
-              <p><strong>ℹ️ Note:</strong> You'll be automatically logged in after setting your password.</p>
+              <div class="alert">
+                <p><strong>⚠️ Important:</strong></p>
+                <ul>
+                  <li>This link will expire in 24 hours</li>
+                  <li>After setting your password, you'll need to log in</li>
+                </ul>
+              </div>
 
               <p>If the button doesn't work, copy and paste this link into your browser:</p>
               <p style="word-break: break-all; color: #4F46E5;">${activationUrl}</p>

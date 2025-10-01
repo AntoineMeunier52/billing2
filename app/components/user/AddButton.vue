@@ -48,7 +48,7 @@
               <div class="text-sm text-blue-700 dark:text-blue-300">
                 <p class="font-medium">Email will be sent automatically</p>
                 <p class="text-xs">
-                  User will receive a temporary password via email.
+                  User will receive an email with a link to set their password.
                 </p>
               </div>
             </div>

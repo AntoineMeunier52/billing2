@@ -5,8 +5,10 @@ export default defineTask({
   },
   async run(_event) {
     try {
-      const res = await $fetch("/api/cdr/monthly", { method: "POST" });
-      console.log("[CDR Monthly] agrégats générés avec succès", res);
+      const res = await $fetch("http://localhost:3000/api/cdr/generate", {
+        method: "POST",
+      });
+      console.log("[CDR Monthly] customer rapports create with success", res);
       return { result: res };
     } catch (err) {
       console.error("[CDR Monthly] error", err);

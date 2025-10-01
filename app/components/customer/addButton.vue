@@ -404,9 +404,13 @@ async function handleSubmit() {
   try {
     loading.value = true;
 
+    const token = localStorage.getItem("token");
     await $fetch("/api/customer/create", {
       method: "POST",
       body: customer,
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     });
     toast.add({ title: "Customer created", icon: "lucide:check" });
     open.value = false;

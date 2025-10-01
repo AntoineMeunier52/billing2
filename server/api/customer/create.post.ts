@@ -1,8 +1,11 @@
 import { Customers } from "@@/shared/types/Customer";
 import prisma from "~~/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { requireAuth } from "~~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
+  requireAuth(event);
+
   const {
     name,
     address,

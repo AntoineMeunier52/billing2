@@ -40,8 +40,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Generate activation token (no expiry, will be used once)
+  // Generate activation token with 24h expiry
   const activationToken = crypto.randomBytes(32).toString("hex");
+  const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
   // Create user without password - will be set during activation
   const newUser = await prisma.user.create({
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
       name,
       role: "ADMIN",
       password: "", // Empty password, will be set during activation
-      resetToken: activationToken, // Using resetToken field for activation
+      resetToken: `${activationToken}:${tokenExpiry.getTime()}`, // Token with expiry
     },
     select: {
       id: true,
@@ -62,6 +63,7 @@ export default defineEventHandler(async (event) => {
   });
 
   // Send activation email
+  console.log("send email");
   const emailContent = generateActivationEmail(name, email, activationToken);
   await sendEmail({
     to: email,

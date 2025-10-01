@@ -1,6 +1,8 @@
 import prisma from "~~/lib/prisma";
+import { requireAuth } from "~~/server/utils/auth";
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  requireAuth(event);
   try {
     const customers = await prisma.customer.findMany({
       include: {
