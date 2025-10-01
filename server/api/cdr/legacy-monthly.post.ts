@@ -7,6 +7,7 @@ import {
   type LegacyBillingBlock,
 } from "~~/server/api/utils/pdf-invoice-legacy";
 import type { Decimal } from "@prisma/client/runtime/library";
+import { uploadToSynology, isSynologyUploadEnabled } from "~~/server/utils/synology-upload";
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -120,7 +121,12 @@ export default defineEventHandler(async (event) => {
     customerId: number;
     name: string;
     pdfPath: string;
+    synologyUploaded?: boolean;
+    synologyPath?: string;
+    synologyError?: string;
   }> = [];
+
+  const synologyEnabled = isSynologyUploadEnabled();
 
   for (const c of customersList) {
     const sum = summaryByCustomer.get(c.id);
@@ -202,7 +208,34 @@ export default defineEventHandler(async (event) => {
       outDirBase,
     });
 
-    generated.push({ customerId: c.id, name: c.name, pdfPath });
+    // Upload to Synology if enabled
+    const genData: {
+      customerId: number;
+      name: string;
+      pdfPath: string;
+      synologyUploaded?: boolean;
+      synologyPath?: string;
+      synologyError?: string;
+    } = {
+      customerId: c.id,
+      name: c.name,
+      pdfPath,
+    };
+
+    if (synologyEnabled) {
+      const filename = `${c.name.replace(/[^\w-]+/g, "_")}_${yearMonth}.pdf`;
+      const uploadResult = await uploadToSynology(pdfPath, filename, yearMonth);
+
+      if (uploadResult.success) {
+        genData.synologyUploaded = true;
+        genData.synologyPath = uploadResult.remotePath;
+      } else {
+        genData.synologyUploaded = false;
+        genData.synologyError = uploadResult.error;
+      }
+    }
+
+    generated.push(genData);
   }
 
   return {
